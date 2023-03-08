@@ -1,0 +1,43 @@
+version: "3"
+services:
+  nginx:
+    build: nginx
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - ./drupal:/app/drupal
+      - ./prestashop:/app/prestashop
+      - ./wordpress:/app/wordpress
+      - ./nginx/drupal.conf:/etc/nginx/conf.d/drupal.conf
+      - ./nginx/presta.conf:/etc/nginx/conf.d/presta.conf
+      - ./nginx/wordpress.conf:/etc/nginx/conf.d/wordpress.conf
+      - ./nginx/www.conf:/etc/php/7.4/fpm/pool.d/www.conf
+      - ./nginx/entrypoint.sh:/sbin/entrypoint.sh
+      - ./certs:/certs
+
+  php:
+    build: php
+    volumes:
+      - ./drupal:/app/drupal
+      - ./php/www.conf:/etc/php/8.2/fpm/pool.d/www.conf
+
+  web:
+    build: apache
+    volumes:
+      - ./prestashop:/app/prestashop
+      - ./wordpress:/app/wordpress
+      - ./apache/www.conf:/etc/php/7.4/fpm/pool.d/www.conf
+
+  db:
+    image: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: abc123.
+      MYSQL_DATABASE: dblemp
+      MYSQL_USER: user
+      MYSQL_PASSWORD: abc123.
+    volumes:
+      - basedatos:/var/lib/mysql
+
+volumes:
+  basedatos:
